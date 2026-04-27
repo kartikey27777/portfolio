@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedReturn - A Fresh Approach to Medicine Recycling</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles to apply the Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f0; /* Light blue-gray background */
+            color: #1f2937; /* Dark gray text */
+        }
+        /* Custom transition for smoother section switching */
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Style for active sections */
+        .section.active {
+            display: block;
+        }
+        /* Styling for the 3D canvas */
+        #bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            outline: none;
+            z-index: -1; /* Place it behind all content */
+        }
+        .form-icon-canvas {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto -1rem; /* Center and pull form up */
+            display: block;
+        }
+        .dropdown-menu {
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <canvas id="bg"></canvas>
+
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50 border-b border-gray-200">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-[#00966C]">
+                <a href="#" id="logo">MedReturn</a>
+            </div>
+            <div id="nav-logged-out" class="space-x-2 md:space-x-4 flex items-center">
+                <a href="#landing" class="text-gray-600 hover:text-[#00966C] transition duration-300 font-medium">Home</a>
+                <a href="#how-it-works" class="text-gray-600 hover:text-[#00966C] transition duration-300 font-medium">How It Works</a>
+                <button data-target="help" class="nav-link text-gray-600 hover:text-[#00966C] transition duration-300 font-medium">Help</button>
+                <button data-target="login" class="nav-link bg-[#00966C] text-white px-4 py-2 rounded-lg hover:bg-[#007a57] transition duration-300 font-semibold">Sign In</button>
+            </div>
+            <div id="nav-logged-in" class="hidden space-x-4 flex items-center">
+                 <button data-target="chatbot" class="nav-link text-gray-600 hover:text-[#00966C] font-medium flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.935L3 20l1.42-3.548C3.521 15.52 3 13.83 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    <span class="hidden md:inline">AI Doctor</span>
+                 </button>
+
+                 <!-- Profile Dropdown -->
+                 <div class="relative" id="profile-dropdown-container">
+                    <button id="profile-dropdown-btn" class="p-2 bg-gray-100 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00966C]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </button>
+                    <div id="profile-dropdown-menu" class="dropdown-menu hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-1 z-50 border border-gray-200/80">
+                        <button data-target="marketplace" class="nav-link text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Marketplace</button>
+                        <button id="receiver-dashboard-nav-btn" data-target="marketplace" class="nav-link text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Receiver Dashboard</button>
+                        <div id="donor-nav">
+                            <button data-target="dashboard" class="nav-link text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Donor Dashboard</button>
+                        </div>
+                        <button id="medicines-manager-nav-btn" data-target="medicines-manager" class="nav-link text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Medicines Manager</button>
+                        <button data-target="wallet" class="nav-link text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Wallet</button>
+                        <button data-target="profile" class="nav-link text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</button>
+                        <button data-target="help" class="nav-link text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Help</button>
+                        <div class="border-t my-1"></div>
+                        <button id="logout-button" class="text-left w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50">Logout</button>
+                    </div>
+                 </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <section id="landing" class="section active">
+            <div class="relative min-h-screen flex items-center justify-center md:justify-start">
+                <div class="container mx-auto px-6 relative z-10">
+                   <div class="max-w-xl text-center md:text-left bg-white/50 backdrop-blur-sm p-8 rounded-lg">
+                        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-4 leading-tight">Give Your Unused Medicines a Second Life.</h1>
+                        <p class="text-lg text-gray-700 mb-8">Safely return unexpired medicines, contribute to a healthier planet, and earn back value. MedReturn makes it simple, secure, and rewarding.</p>
+                        <button data-target="signup" class="nav-link bg-[#00966C] text-white px-8 py-3 rounded-lg hover:bg-[#007a57] transition duration-300 font-bold text-lg shadow-lg shadow-[#00966C]/20">Join MedReturn Today</button>
+                    </div>
+                </div>
+            </div>
+             <div id="how-it-works" class="py-24 border-y border-gray-200/50 relative z-10">
+                <div class="container mx-auto px-6">
+                    <div class="text-center max-w-2xl mx-auto mb-16 bg-white/50 backdrop-blur-sm p-8 rounded-lg">
+                         <h2 class="text-3xl font-bold text-gray-900 mb-4">A Simple Path to a Greener Pharmacy</h2>
+                         <p class="text-gray-600">Our process is designed to be transparent and straightforward from start to finish.</p>
+                    </div>
+                    <div class="grid md:grid-cols-3 gap-8 text-center">
+                        <div class="bg-white/50 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-white/20">
+                            <div class="bg-white/70 text-[#00966C] rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                               <img src="https://placehold.co/48x48/E6F5F1/00966C?text=1" alt="Step 1 icon" class="rounded-lg opacity-80">
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">1. Register & Submit</h3>
+                            <p class="text-gray-700">Create your secure account and easily upload photos and details of your medicine.</p>
+                        </div>
+                        <div class="bg-white/50 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-white/20">
+                             <div class="bg-white/70 text-[#00966C] rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                               <img src="https://placehold.co/48x48/E6F5F1/00966C?text=2" alt="Step 2 icon" class="rounded-lg opacity-80">
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">2. Drop Off Locally</h3>
+                            <p class="text-gray-700">Find a verified partner pharmacy near you to securely drop off the medication.</p>
+                        </div>
+                        <div class="bg-white/50 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-white/20">
+                           <div class="bg-white/70 text-[#00966C] rounded-lg w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                                <img src="https://placehold.co/48x48/E6F5F1/00966C?text=3" alt="Step 3 icon" class="rounded-lg opacity-80">
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">3. Receive Refund</h3>
+                            <p class="text-gray-700">After verification, a partial refund is credited to your MedReturn Wallet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="relative z-10">
+
+        <section id="signup" class="section py-20">
+            <div class="flex items-center justify-center">
+                <div class="w-full max-w-md bg-white/50 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-white/20">
+                    <canvas id="signup-canvas" class="form-icon-canvas"></canvas>
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-6">Create Your Account</h2>
+                    <form id="signup-form">
+                        <div class="mb-4">
+                            <label for="signup-name" class="block text-gray-700 font-medium mb-2">Full Name</label>
+                            <input type="text" id="signup-name" class="w-full px-4 py-2 bg-white/80 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="signup-email" class="block text-gray-700 font-medium mb-2">Email Address</label>
+                            <input type="email" id="signup-email" class="w-full px-4 py-2 bg-white/80 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="signup-password" class="block text-gray-700 font-medium mb-2">Password (min. 6 characters)</label>
+                            <input type="password" id="signup-password" class="w-full px-4 py-2 bg-white/80 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="signup-confirm-password" class="block text-gray-700 font-medium mb-2">Confirm Password</label>
+                            <input type="password" id="signup-confirm-password" class="w-full px-4 py-2 bg-white/80 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-gray-700 font-medium mb-2">I am a:</label>
+                            <div class="grid grid-cols-3 gap-1 bg-gray-100 p-1 rounded-lg">
+                                <label class="text-center">
+                                    <input type="radio" name="userType" value="receiver" class="sr-only" checked>
+                                    <span class="user-type-label cursor-pointer block p-2 rounded-md font-medium text-sm">Receiver</span>
+                                </label>
+                                <label class="text-center">
+                                    <input type="radio" name="userType" value="donor" class="sr-only">
+                                    <span class="user-type-label cursor-pointer block p-2 rounded-md font-medium text-sm">Donor</span>
+                                </label>
+                                <label class="text-center">
+                                    <input type="radio" name="userType" value="organization" class="sr-only">
+                                    <span class="user-type-label cursor-pointer block p-2 rounded-md font-medium text-sm">Organization</span>
+                                </label>
+                            </div>
+                             <style>
+                                input[name="userType"]:checked + .user-type-label {
+                                    background-color: #00966C;
+                                    color: white;
+                                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                                }
+                                .user-type-label {
+                                    transition: all 0.2s ease-in-out;
+                                }
+                            </style>
+                        </div>
+                        <button type="submit" class="w-full bg-[#00966C] text-white py-2.5 rounded-lg hover:bg-[#007a57] transition duration-300 font-semibold text-lg">Sign Up</button>
+                    </form>
+                    <p class="text-center text-gray-700 mt-4">
+                        Already have an account? <a href="#" data-target="login" class="nav-link text-[#007a57] hover:underline font-medium">Sign In</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="login" class="section py-20">
+            <div class="flex items-center justify-center">
+                <div class="w-full max-w-md bg-white/50 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-white/20">
+                    <canvas id="login-canvas" class="form-icon-canvas"></canvas>
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-6">Welcome Back!</h2>
+                    <form id="login-form">
+                        <div class="mb-4">
+                            <label for="login-email" class="block text-gray-700 font-medium mb-2">Email Address</label>
+                            <input type="email" id="login-email" class="w-full px-4 py-2 bg-white/80 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                        </div>
+                        <div class="mb-6">
+                             <div class="flex justify-between items-center mb-2">
+                                <label for="login-password" class="block text-gray-700 font-medium">Password</label>
+                                <a href="#" data-target="forgot-password" class="nav-link text-sm font-medium text-[#007a57] hover:underline">Forgot Password?</a>
+                            </div>
+                            <input type="password" id="login-password" class="w-full px-4 py-2 bg-white/80 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                        </div>
+                        <button type="submit" class="w-full bg-[#00966C] text-white py-2.5 rounded-lg hover:bg-[#007a57] transition duration-300 font-semibold text-lg">Sign In</button>
+                    </form>
+                     <p class="text-center text-gray-700 mt-4">
+                        Don't have an account? <a href="#" data-target="signup" class="nav-link text-[#007a57] hover:underline font-medium">Sign Up</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="forgot-password" class="section py-20">
+            <div class="flex items-center justify-center">
+                <div class="w-full max-w-md bg-white/50 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-white/20">
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">Reset Password</h2>
+                    <p class="text-center text-gray-700 mb-6">Enter your email and we'll send a link to get back into your account.</p>
+                    <form id="forgot-password-form">
+                        <div class="mb-4">
+                            <label for="forgot-email" class="block text-gray-700 font-medium mb-2">Email Address</label>
+                            <input type="email" id="forgot-email" class="w-full px-4 py-2 bg-white/80 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                        </div>
+                        <button type="submit" class="w-full bg-[#00966C] text-white py-2.5 rounded-lg hover:bg-[#007a57] transition duration-300 font-semibold text-lg">Send Reset Link</button>
+                    </form>
+                     <p class="text-center text-gray-700 mt-4">
+                        Remembered it? <a href="#" data-target="login" class="nav-link text-[#007a57] hover:underline font-medium">Back to Sign In</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="help" class="section py-20">
+            <div class="container mx-auto px-6">
+                <div class="max-w-4xl mx-auto bg-white/50 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-white/20">
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-8">Help & Guidelines</h2>
+                    <div class="space-y-6 text-gray-700">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">How does MedReturn work in real life?</h3>
+                            <p>Our goal is to create a safe and beneficial cycle for unused medicines. When you submit a medicine, it doesn't just disappear. Here's the real-world journey:</p>
+                            <ul class="list-disc list-inside mt-2 space-y-1 pl-4">
+                                <li><strong>Verification:</strong> Our partner pharmacies physically inspect your returned medicine to ensure the packaging is untampered, it's not expired, and it has been stored correctly.</li>
+                                <li><strong>Re-dispensing:</strong> Once verified, these medicines are re-dispensed at a reduced cost to patients in need, improving healthcare accessibility. They are never resold at full price.</li>
+                                <li><strong>Secure Disposal:</strong> Medicines that don't pass verification are disposed of using environmentally safe methods, preventing them from contaminating our water systems.</li>
+                                <li><strong>Refund:</strong> Your refund is a percentage of the value recovered by re-dispensing the medicine. This is credited directly to your MedReturn Wallet.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Frequently Asked Questions (FAQ)</h3>
+                            <p><strong>What medicines can I return?</strong><br>You can return most non-prescription and prescription tablets and capsules that are in their original, sealed blister packs. We cannot accept liquids, injections, or opened medicine bottles.</p>
+                            <p class="mt-2"><strong>Is my data secure?</strong><br>Absolutely. All personal information is stored securely and is never shared with third parties.</p>
+                        </div>
+                         <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Contact Us</h3>
+                            <p>For any issues, feedback, or questions, please don't hesitate to reach out to our customer care team.</p>
+                             <ul class="list-disc list-inside mt-2 space-y-1 pl-4">
+                                 <li><strong>Email:</strong> <a href="mailto:medreturnofficial@gmail.com" class="text-[#007a57] hover:underline">medreturnofficial@gmail.com</a></li>
+                                 <li><strong>Phone:</strong> <a href="tel:8223099685" class="text-[#007a57] hover:underline">+91 82230 99685</a></li>
+                             </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        </div>
+
+        <section id="marketplace" class="section py-16 bg-white relative z-10">
+            <div class="container mx-auto px-6">
+                <div id="marketplace-header">
+                    </div>
+                <div id="marketplace-container" class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    </div>
+            </div>
+        </section>
+        
+        <section id="medicines-manager" class="section py-16 bg-white relative z-10">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Medicines Manager</h2>
+                <p class="text-gray-500 mb-8">Track your daily medicines and your donation submissions.</p>
+
+                <div id="medicines-summary" class="mb-8 space-y-4"></div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                     <!-- Left Column for Management -->
+                    <div class="space-y-8">
+                        <!-- Add Medicine Form -->
+                        <div>
+                            <div class="bg-gray-50 p-6 rounded-xl shadow-lg border border-gray-200/80">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">Add & Manage Active Medicines</h3>
+                                <form id="add-medicine-form">
+                                    <div class="mb-4">
+                                        <label for="manage-med-name" class="block text-gray-700 font-medium mb-2">Medicine Name</label>
+                                        <input type="text" id="manage-med-name" class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="manage-med-total" class="block text-gray-700 font-medium mb-2">Total Pills / Tablets</label>
+                                        <input type="number" id="manage-med-total" class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="manage-med-per-day" class="block text-gray-700 font-medium mb-2">Pills to Take Per Day</label>
+                                        <input type="number" id="manage-med-per-day" class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="manage-med-days" class="block text-gray-700 font-medium mb-2">Total Days for Dosage</label>
+                                        <input type="number" id="manage-med-days" class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                                    </div>
+                                    <button type="submit" class="w-full bg-[#00966C] text-white py-2.5 rounded-lg hover:bg-[#007a57] transition duration-300 font-semibold">Add Medicine</button>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- Active Medicines List -->
+                        <div id="medicines-list-container" class="space-y-4">
+                            <!-- Active medicines will be rendered here -->
+                        </div>
+                    </div>
+                    <!-- Right Column for Donation Tracking -->
+                    <div id="submitted-donations-container" class="bg-gray-50 p-6 rounded-xl shadow-lg border border-gray-200/80">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Submitted for Donation</h3>
+                        <div id="submitted-donations-list" class="space-y-3">
+                           <!-- submitted list here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="dashboard" class="section py-16 bg-white relative z-10">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900">My Returns Dashboard</h2>
+                        <p class="text-gray-500 mt-1">Track the status of all your medicine submissions.</p>
+                    </div>
+                    <button data-target="submit-medicine" class="nav-link bg-[#00966C] text-white px-6 py-2.5 rounded-lg hover:bg-[#007a57] transition duration-300 font-semibold flex items-center space-x-2 shadow-md shadow-[#00966C]/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                        <span>Submit New Medicine</span>
+                    </button>
+                </div>
+                <div id="submissions-container" class="bg-white p-2 md:p-6 rounded-xl shadow-lg border border-gray-200/80">
+                     <div class="text-center text-gray-500 py-12">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">No submissions</h3>
+                        <p class="mt-1 text-sm text-gray-500">Get started by submitting your first medicine.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="chatbot" class="section py-16 bg-gray-50/50 backdrop-blur-sm relative z-10">
+            <div class="container mx-auto px-6">
+                <div class="max-w-md mx-auto bg-white/70 backdrop-blur-md rounded-xl shadow-lg border border-gray-200">
+                    <div class="p-4 border-b border-gray-200">
+                        <h3 class="text-xl font-bold text-[#00966C]">AI Doctor Chatbot</h3>
+                    </div>
+                    <div id="chat-window" class="h-96 overflow-y-auto p-4 space-y-3 text-sm">
+                        </div>
+                    <div class="p-3 border-t border-gray-200 flex space-x-2">
+                        <input id="chat-input" type="text" placeholder="Type your health issue..." class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]">
+                        <button id="send-btn" class="bg-[#00966C] text-white px-4 py-2 rounded-lg hover:bg-[#007a57]">Send</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="profile" class="section py-20 bg-gray-100/50 backdrop-blur-sm">
+             <div class="flex items-center justify-center">
+                <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-gray-200/80">
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-6">My Profile</h2>
+                    <form id="profile-form">
+                         <!-- Standard Fields -->
+                        <div class="mb-4">
+                            <label for="profile-name" class="block text-gray-700 font-medium mb-2">Full Name / Organization Representative</label>
+                            <input type="text" id="profile-name" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="profile-email" class="block text-gray-700 font-medium mb-2">Login Email Address</label>
+                            <input type="email" id="profile-email" class="w-full px-4 py-2 bg-gray-200 border border-gray-300 rounded-lg cursor-not-allowed" readonly>
+                        </div>
+                        <div class="mb-6">
+                            <label for="profile-phone" class="block text-gray-700 font-medium mb-2">Phone Number (Optional)</label>
+                            <input type="tel" id="profile-phone" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]">
+                        </div>
+
+                        <!-- Organization-specific Fields -->
+                        <div id="org-fields" class="hidden space-y-4 pt-4 mt-4 border-t">
+                            <h3 class="text-lg font-semibold text-gray-800 text-center">Organization Details</h3>
+                             <div class="mb-4">
+                                <label for="org-name" class="block text-gray-700 font-medium mb-2">Organization Name</label>
+                                <input type="text" id="org-name" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="org-mail" class="block text-gray-700 font-medium mb-2">Official Email</label>
+                                <input type="email" id="org-mail" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                            </div>
+                            <div class="mb-6">
+                                <label for="org-id" class="block text-gray-700 font-medium mb-2">Organization ID</label>
+                                <input type="text" id="org-id" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-[#00966C] text-white py-2.5 rounded-lg hover:bg-[#007a57] transition duration-300 font-semibold text-lg mt-4">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="wallet" class="section py-20 bg-gray-100/50 backdrop-blur-sm">
+             <div class="flex items-center justify-center">
+                <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-gray-200/80 text-center">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">My Wallet</h2>
+                    <p class="text-gray-600 mb-6">Refunds from verified returns will be added here.</p>
+                    <div class="bg-green-100/80 p-6 rounded-lg mb-6">
+                        <p class="text-lg font-medium text-gray-600">Current Balance</p>
+                        <p id="wallet-balance" class="text-4xl font-bold text-[#007a57]">₹0.00</p>
+                    </div>
+                    <form id="add-money-form" class="mb-4">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Add Money to Wallet</h3>
+                        <div class="mb-4">
+                            <label for="add-money-amount" class="block text-gray-700 font-medium mb-2">Amount (₹)</label>
+                            <input type="number" id="add-money-amount" min="1" step="0.01" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                        </div>
+                        <button type="submit" class="w-full bg-[#00966C] text-white py-2.5 rounded-lg hover:bg-[#007a57] transition duration-300 font-semibold text-lg">Add via UPI</button>
+                    </form>
+                    <button id="withdraw-button" class="w-full bg-gray-700 text-white py-2.5 rounded-lg hover:bg-gray-600 transition duration-300 font-semibold text-lg">Withdraw Funds</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="kyc" class="section py-20 bg-gray-100/50 backdrop-blur-sm">
+             <div class="flex items-center justify-center">
+                <div class="w-full max-w-lg bg-white p-8 rounded-xl shadow-lg border border-gray-200/80">
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-2">KYC Verification</h2>
+                    <p class="text-center text-gray-600 mb-6">To withdraw funds, please complete your one-time KYC verification.</p>
+                    <form id="kyc-form">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="md:col-span-2">
+                                <label for="kyc-name" class="block text-gray-700 font-medium mb-2">Full Name (as per documents)</label>
+                                <input type="text" id="kyc-name" class="w-full px-4 py-2 bg-gray-200 border border-gray-300 rounded-lg cursor-not-allowed" readonly>
+                            </div>
+                            <div>
+                                <label for="kyc-pan" class="block text-gray-700 font-medium mb-2">PAN Number</label>
+                                <input type="text" id="kyc-pan" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                            </div>
+                             <div>
+                                <label for="kyc-ifsc" class="block text-gray-700 font-medium mb-2">IFSC Code</label>
+                                <input type="text" id="kyc-ifsc" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="kyc-account-number" class="block text-gray-700 font-medium mb-2">Bank Account Number</label>
+                                <input type="text" id="kyc-account-number" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full mt-8 bg-[#00966C] text-white py-3 rounded-lg hover:bg-[#007a57] transition duration-300 font-semibold text-lg">Submit for Verification</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="withdraw" class="section py-20 bg-gray-100/50 backdrop-blur-sm">
+             <div class="flex items-center justify-center">
+                <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-gray-200/80 text-center">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Withdraw Funds</h2>
+                    <p class="text-gray-600 mb-6">Transfer your wallet balance to your bank account.</p>
+                     <div class="bg-blue-100/80 p-6 rounded-lg mb-6 text-left">
+                        <p class="text-lg font-medium text-gray-600">Withdraw to:</p>
+                        <p id="withdraw-bank-details" class="font-semibold text-gray-800"></p>
+                    </div>
+                    <form id="withdraw-form">
+                        <div class="mb-4">
+                            <label for="withdraw-amount" class="block text-gray-700 font-medium mb-2">Amount to Withdraw (₹)</label>
+                            <input type="number" id="withdraw-amount" min="1" step="0.01" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold text-lg">Request Withdrawal</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="submit-medicine" class="section py-20 bg-gray-100 relative z-10">
+            <div class="flex items-center justify-center">
+                <div class="w-full max-w-lg bg-white p-8 rounded-xl shadow-lg border border-gray-200/80">
+                    <div class="flex justify-between items-start mb-6">
+                        <h2 class="text-3xl font-bold text-gray-900">Submit Unused Medicine</h2>
+                         <button data-target="dashboard" class="nav-link text-gray-500 hover:text-red-500 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    <form id="medicine-form">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="md:col-span-2">
+                                <label for="med-name" class="block text-gray-700 font-medium mb-2">Medicine Name & Dosage</label>
+                                <input type="text" id="med-name" placeholder="e.g., Paracetamol 500mg" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                            </div>
+                             <div>
+                                <label for="med-mrp" class="block text-gray-700 font-medium mb-2">MRP (₹)</label>
+                                <input type="number" id="med-mrp" placeholder="e.g., 100" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                            </div>
+                            <div>
+                                <label for="med-total-tablets" class="block text-gray-700 font-medium mb-2">Total Tablets in Pack</label>
+                                <input type="number" id="med-total-tablets" placeholder="e.g., 10" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                            </div>
+                             <div class="md:col-span-2">
+                                <div class="flex items-center justify-between">
+                                     <button type="button" id="verify-ai-btn" class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-md hover:bg-blue-200">Verify with AI (Beta)</button>
+                                     <div id="ai-verification-status" class="text-xs font-medium"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="batch-no" class="block text-gray-700 font-medium mb-2">Batch Number</label>
+                                <input type="text" id="batch-no" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                            </div>
+                            <div>
+                                <label for="quantity" class="block text-gray-700 font-medium mb-2">Quantity Remaining</label>
+                                <input type="number" id="quantity" placeholder="e.g., 8" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                            </div>
+                             <div class="md:col-span-2">
+                                <label for="expiry-date" class="block text-gray-700 font-medium mb-2">Expiry Date</label>
+                                <input type="month" id="expiry-date" class="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00966C]" required>
+                            </div>
+                             <div class="md:col-span-2">
+                                <label for="photos" class="block text-gray-700 font-medium mb-2">Photos of Strip/Box [up to 3]</label>
+                                <input type="file" id="photos" multiple accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-[#00966C] hover:file:bg-gray-200">
+                                <div id="file-list" class="text-xs text-gray-500 mt-2 space-y-1"></div>
+                            </div>
+                        </div>
+                        <button type="submit" id="submit-med-btn" class="w-full mt-8 bg-[#00966C] text-white py-3 rounded-lg hover:bg-[#007a57] transition duration-300 font-semibold text-lg">Submit for Verification</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+        
+        <section id="admin-panel" class="section py-20">
+             <div class="container mx-auto px-6">
+                <div class="max-w-7xl mx-auto bg-white/50 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-white/20">
+                    <div class="flex justify-between items-center mb-8">
+                        <h2 class="text-3xl font-bold text-gray-900">Admin Monitoring System</h2>
+                        <button id="close-admin-panel" class="text-gray-500 hover:text-red-500 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    <!-- Stats -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10 text-center">
+                        <div class="bg-white/70 backdrop-blur-sm p-6 rounded-lg shadow-md border border-gray-200/80"><p class="text-sm text-gray-600">Total Users</p><p id="admin-total-users" class="text-3xl font-bold text-[#00966C]"></p></div>
+                        <div class="bg-white/70 backdrop-blur-sm p-6 rounded-lg shadow-md border border-gray-200/80"><p class="text-sm text-gray-600">Total Donors</p><p id="admin-total-donors" class="text-3xl font-bold text-[#00966C]"></p></div>
+                        <div class="bg-white/70 backdrop-blur-sm p-6 rounded-lg shadow-md border border-gray-200/80"><p class="text-sm text-gray-600">Total Receivers</p><p id="admin-total-receivers" class="text-3xl font-bold text-[#00966C]"></p></div>
+                        <div class="bg-white/70 backdrop-blur-sm p-6 rounded-lg shadow-md border border-gray-200/80"><p class="text-sm text-gray-600">Total Submissions</p><p id="admin-total-submissions" class="text-3xl font-bold text-[#00966C]"></p></div>
+                    </div>
+
+                    <!-- User Management -->
+                    <div class="bg-white/70 backdrop-blur-sm p-6 rounded-lg shadow-md border border-gray-200/80 mb-10">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800">User Management</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="border-b-2 border-gray-200"><tr class="text-gray-600"><th class="p-3">Name</th><th class="p-3">Email</th><th class="p-3">Type</th><th class="p-3">Wallet</th><th class="p-3">Action</th></tr></thead>
+                                <tbody id="admin-users-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Submissions -->
+                    <div class="bg-white/70 backdrop-blur-sm p-6 rounded-lg shadow-md border border-gray-200/80">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800">All Submissions</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="border-b-2 border-gray-200"><tr class="text-gray-600"><th class="p-3">Medicine</th><th class="p-3">Donor</th><th class="p-3">Status</th></tr></thead>
+                                <tbody id="admin-submissions-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <div id="message-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[100] p-4">
+            <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-sm mx-auto">
+                <div id="modal-content">
+                    <p id="modal-text" class="text-lg font-medium text-gray-800 mb-6"></p>
+                </div>
+                <button id="modal-close" class="bg-[#00966C] text-white px-6 py-2 rounded-lg hover:bg-[#007a57]">OK</button>
+            </div>
+        </div>
+
+        <div id="payment-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+            <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-sm mx-auto">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Complete Your Payment</h3>
+                <p class="text-gray-600 mb-4">Scan the QR code with your UPI app to pay <span id="payment-amount" class="font-bold"></span>.</p>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=satyamsahu16906@axl" alt="UPI QR Code" class="mx-auto rounded-lg mb-4">
+                <p class="text-sm text-gray-500 mb-6">This is a simulation. No real payment will be processed.</p>
+                <button id="payment-confirm" class="w-full bg-[#00966C] text-white py-2.5 rounded-lg hover:bg-[#007a57] transition duration-300 font-semibold text-lg">Confirm Payment</button>
+            </div>
+        </div>
+
+    </main>
+    
+    <button id="chat-fab" class="fixed bottom-6 right-6 bg-[#00966C] text-white p-4 rounded-full shadow-lg hover:bg-[#007a57] z-50">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.935L3 20l1.42-3.548C3.521 15.52 3 13.83 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+    </button>
+
+    <footer class="bg-gray-800 relative z-10">
+        <div class="container mx-auto px-6 py-8 text-center text-gray-400">
+             <div class="mb-4">
+                 <p class="font-semibold">Contact Customer Care</p>
+                 <a href="mailto:medreturnofficial@gmail.com" class="text-gray-300 hover:text-white hover:underline">medreturnofficial@gmail.com</a>
+                 <span class="mx-2">|</span>
+                 <a href="tel:8223099685" class="text-gray-300 hover:text-white hover:underline">+91 82230 99685</a>
+             </div>
+            <p>&copy; 2025 MedReturn. All rights reserved.</p>
+        </div>
+    </footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script type="module">
+    // --- 3D SCENE SETUP ---
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({
+        canvas: document.querySelector('#bg'),
+        alpha: true 
+    });
+
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.position.setZ(30);
+
+    const pointLight = new THREE.PointLight(0xffffff);
+    pointLight.position.set(20, 20, 20);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(pointLight, ambientLight);
+
+    const objects = [];
+    
+    // Materials
+    const metalMaterial = new THREE.MeshStandardMaterial({
+        color: 0xb0c4de, // Light steel blue
+        metalness: 0.9,
+        roughness: 0.2,
+    });
+    const plasticMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        metalness: 0.1,
+        roughness: 0.5,
+        transparent: true,
+        opacity: 0.8
+    });
+
+    function createScalpel() {
+        const group = new THREE.Group();
+        const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 5, 16), metalMaterial);
+        const bladeGeo = new THREE.BufferGeometry();
+        const vertices = new Float32Array([
+            0, 0, 0,
+            0, 1.5, 0,
+            -0.5, 1, 0
+        ]);
+        bladeGeo.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+        const blade = new THREE.Mesh(bladeGeo, metalMaterial);
+        
+        handle.rotation.z = Math.PI / 4;
+        blade.position.y = 2.5;
+        blade.scale.set(1.5,1.5,1.5);
+
+        group.add(handle, blade);
+        return group;
+    }
+
+    function createForceps() {
+        const group = new THREE.Group();
+        const leg1 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 6, 0.2), metalMaterial);
+        const leg2 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 6, 0.2), metalMaterial);
+        leg1.rotation.z = 0.3;
+        leg2.rotation.z = -0.3;
+        group.add(leg1, leg2);
+        return group;
+    }
+
+    function createSyringe() {
+        const group = new THREE.Group();
+        // Barrel
+        const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 5, 16, 1, true), plasticMaterial);
+        // Flange
+        const flange = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.1, 16, 100), plasticMaterial);
+        flange.position.y = 2.5;
+        flange.rotation.x = Math.PI / 2;
+        // Plunger
+        const plungerRod = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 6, 16), plasticMaterial);
+        plungerRod.position.y = 1;
+        const thumbRest = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.2, 16), plasticMaterial);
+        thumbRest.position.y = 4;
+        // Needle
+        const needleBase = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.5, 0.5, 16), metalMaterial);
+        needleBase.position.y = -2.75;
+        const needle = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2, 16), metalMaterial);
+        needle.position.y = -4;
+
+        group.add(barrel, flange, plungerRod, thumbRest, needleBase, needle);
+        return group;
+    }
+    
+    const objectTypes = [createScalpel, createForceps, createSyringe];
+
+    function addInstrument() {
+        const typeIndex = Math.floor(Math.random() * objectTypes.length);
+        const instrument = objectTypes[typeIndex]();
+
+        const [x, y, z] = Array(3).fill().map(() => THREE.MathUtils.randFloatSpread(100));
+        instrument.position.set(x, y, z);
+
+        const [rx, ry, rz] = Array(3).fill().map(() => Math.random() * 2 * Math.PI);
+        instrument.rotation.set(rx, ry, rz);
+
+        scene.add(instrument);
+        objects.push(instrument);
+    }
+    
+    Array(40).fill().forEach(addInstrument);
+
+    function moveCamera() {
+        const t = document.body.getBoundingClientRect().top;
+        camera.position.z = t * -0.01 + 30;
+        camera.position.x = t * -0.002;
+        camera.position.y = t * 0.002;
+    }
+    document.body.onscroll = moveCamera;
+
+    function animate() {
+        requestAnimationFrame(animate);
+        objects.forEach(obj => {
+            obj.rotation.x += 0.001;
+            obj.rotation.y += 0.001;
+        });
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+    // --- End of 3D Scene Setup ---
+
+</script>
+
+<script>
+// --- WEBSITE LOGIC ---
+document.addEventListener('DOMContentLoaded', () => {
+    // --- IMPORTANT: REPLACE WITH YOUR GEMINI API KEY ---
+    const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"; // <--- PASTE YOUR KEY HERE
+
+    // --- FORM ICON 3D SCENES ---
+    function initIconScene(canvasId, createObjectFn, color) {
+        const canvas = document.querySelector(canvasId);
+        if (!canvas) return;
+        
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+        
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(100, 100);
+        camera.position.setZ(8);
+
+        const material = new THREE.MeshStandardMaterial({
+            color: color || '#00966C',
+            metalness: 0.3,
+            roughness: 0.3,
+        });
+
+        const object = createObjectFn(material);
+        scene.add(object);
+
+        const pointLight = new THREE.PointLight(0xffffff, 2);
+        pointLight.position.set(5, 10, 15);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+        scene.add(pointLight, ambientLight);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            object.rotation.y += 0.01;
+            object.rotation.x += 0.005;
+            renderer.render(scene, camera);
+        }
+        animate();
+    }
+
+    // Signup Icon: Plus Sign
+    initIconScene('#signup-canvas', (material) => {
+        const group = new THREE.Group();
+        const geo1 = new THREE.BoxGeometry(1, 4, 1);
+        const geo2 = new THREE.BoxGeometry(4, 1, 1);
+        const mesh1 = new THREE.Mesh(geo1, material);
+        const mesh2 = new THREE.Mesh(geo2, material);
+        group.add(mesh1, mesh2);
+        return group;
+    });
+
+    // Login Icon: Lock
+    initIconScene('#login-canvas', (material) => {
+        const group = new THREE.Group();
+        const bodyGeo = new THREE.BoxGeometry(3, 2.5, 1.5);
+        const shackleGeo = new THREE.TorusGeometry(1, 0.4, 16, 100, Math.PI);
+        const body = new THREE.Mesh(bodyGeo, material);
+        const shackle = new THREE.Mesh(shackleGeo, material);
+        shackle.position.y = 1.2;
+        shackle.rotation.z = Math.PI;
+        group.add(body, shackle);
+        return group;
+    });
+
+
+    // --- STATE AND DATA MANAGEMENT ---
+    let currentUser = null;
+    let usersDB = JSON.parse(localStorage.getItem('medreturn_users')) || [];
+
+    const saveUsers = () => {
+        localStorage.setItem('medreturn_users', JSON.stringify(usersDB));
+    };
+    
+    const getSubmissions = (email) => {
+        return JSON.parse(localStorage.getItem(`submissions_${email}`)) || [];
+    };
+
+    const saveSubmissions = (email, submissions) => {
+        localStorage.setItem(`submissions_${email}`, JSON.stringify(submissions));
+    };
+    
+    const getMedicines = (email) => {
+        return JSON.parse(localStorage.getItem(`medicines_${email}`)) || [];
+    };
+
+    const saveMedicines = (email, medicines) => {
+        localStorage.setItem(`medicines_${email}`, JSON.stringify(medicines));
+    };
+
+    // --- UI AND NAVIGATION ---
+    const sections = document.querySelectorAll('.section');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const navLoggedIn = document.getElementById('nav-logged-in');
+    const navLoggedOut = document.getElementById('nav-logged-out');
+    const logo = document.getElementById('logo');
+    const modal = document.getElementById('message-modal');
+    const modalContent = document.getElementById('modal-content');
+    const modalClose = document.getElementById('modal-close');
+    const photosInput = document.getElementById('photos');
+    const fileListDiv = document.getElementById('file-list');
+    const paymentModal = document.getElementById('payment-modal');
+
+    const showSection = (id) => {
+        if (!id) return;
+
+        // Force organization to complete profile
+        if (currentUser && currentUser.userType === 'organization' && !currentUser.orgProfileComplete && id !== 'profile' && id !== 'login' && id !== 'signup') {
+            showModal("You must complete your organization profile to access other sections.");
+            id = 'profile'; // Force redirect to profile
+        }
+
+        if (id === 'profile') renderProfile();
+        if (id === 'wallet') renderWallet();
+        if (id === 'marketplace') renderMarketplace();
+        if (id === 'medicines-manager') renderMedicinesManager();
+        
+        sections.forEach(section => {
+            section.classList.toggle('active', section.id === id);
+        });
+        window.scrollTo(0, 0); // Scroll to top on section change
+        if (id === 'chatbot') {
+            setTimeout(() => document.getElementById('chat-input').focus(), 100);
+        }
+    };
+    
+    const showModal = (message, isHTML = false) => {
+        if (isHTML) {
+            modalContent.innerHTML = message;
+        } else {
+            modalContent.innerHTML = `<p id="modal-text" class="text-lg font-medium text-gray-800 mb-6">${message}</p>`;
+        }
+        modal.classList.remove('hidden');
+    };
+
+    modalClose.addEventListener('click', () => modal.classList.add('hidden'));
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.getAttribute('data-target');
+            if (targetId) {
+                showSection(targetId);
+            }
+        });
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (href === '#how-it-works') {
+                e.preventDefault();
+                showSection('landing');
+                setTimeout(() => {
+                    document.querySelector('#how-it-works').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }, 100);
+            } else if (href === '#landing') {
+                e.preventDefault();
+                showSection('landing');
+            }
+        });
+    });
+
+    logo.addEventListener('click', (e) => {
+        e.preventDefault();
+        showSection(currentUser ? 'marketplace' : 'landing');
+    });
+
+    const updateUIForAuthState = () => {
+        const donorNav = document.getElementById('donor-nav');
+        const medManagerNav = document.getElementById('medicines-manager-nav-btn');
+        const receiverDashboardNav = document.getElementById('receiver-dashboard-nav-btn');
+        const profileDropdownLinks = document.querySelectorAll('#profile-dropdown-menu .nav-link, #profile-dropdown-menu #donor-nav button');
+
+
+        if (currentUser) {
+            navLoggedIn.classList.remove('hidden');
+            navLoggedOut.classList.add('hidden');
+
+            // Hide all role-specific buttons by default
+            donorNav.style.display = 'none';
+            medManagerNav.style.display = 'none';
+            receiverDashboardNav.style.display = 'none';
+
+            if (currentUser.userType === 'donor') {
+                donorNav.style.display = 'block';
+                medManagerNav.style.display = 'block';
+            } else if (currentUser.userType === 'receiver') {
+                // No special buttons for receiver, marketplace is the main view
+            }
+            else if (currentUser.userType === 'organization') {
+                donorNav.style.display = 'block';
+                medManagerNav.style.display = 'block';
+                receiverDashboardNav.style.display = 'block';
+            }
+            
+            if (currentUser.userType === 'organization' && !currentUser.orgProfileComplete) {
+                // Disable all nav links except profile and logout
+                 profileDropdownLinks.forEach(link => {
+                    const target = link.getAttribute('data-target');
+                    if(target !== 'profile') {
+                       link.style.display = 'none';
+                    } else {
+                       link.style.display = 'block';
+                    }
+                });
+                document.getElementById('logout-button').style.display = 'block';
+
+                showSection('profile');
+                showModal("Welcome! Please complete your organization's profile to continue.");
+            } else {
+                // Ensure all links are visible for complete profiles
+                profileDropdownLinks.forEach(link => link.style.display = 'block');
+                updateUIForAuthStateRoles(); // Re-show the correct role links
+                renderMarketplace();
+                showSection('marketplace');
+            }
+
+        } else {
+            navLoggedIn.classList.add('hidden');
+            navLoggedOut.classList.remove('hidden');
+            showSection('landing');
+        }
+    };
+    
+    const updateUIForAuthStateRoles = () => {
+        const donorNav = document.getElementById('donor-nav');
+        const medManagerNav = document.getElementById('medicines-manager-nav-btn');
+        const receiverDashboardNav = document.getElementById('receiver-dashboard-nav-btn');
+        
+        // Reset all first
+        donorNav.style.display = 'none';
+        medManagerNav.style.display = 'none';
+        receiverDashboardNav.style.display = 'none';
+        
+        if (!currentUser) return;
+
+        if (currentUser.userType === 'donor') {
+            donorNav.style.display = 'block';
+            medManagerNav.style.display = 'block';
+        } else if (currentUser.userType === 'organization') {
+            donorNav.style.display = 'block';
+            medManagerNav.style.display = 'block';
+            receiverDashboardNav.style.display = 'block';
+        } else if (currentUser.userType === 'receiver'){
+            // Receiver specific logic here if any
+        }
+    };
+    
+    const statusPill = (status) => {
+        const colors = {
+            pending: 'bg-yellow-100 text-yellow-800',
+            verified: 'bg-green-100 text-green-800',
+            rejected: 'bg-red-100 text-red-800'
+        };
+        return `<span class="px-3 py-1 text-xs font-medium rounded-full ${colors[status] || ''}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>`;
+    };
+
+    // --- MARKETPLACE RENDERING ---
+    const renderMarketplace = () => {
+        if (!currentUser) return;
+        const container = document.getElementById('marketplace-container');
+        const header = document.getElementById('marketplace-header');
+        container.innerHTML = '';
+        header.innerHTML = '';
+
+        // Organization sees both
+        if (currentUser.userType === 'organization') {
+            container.innerHTML = `
+                <div class="col-span-full md:col-span-2 lg:col-span-3">
+                    <div id="org-donors-section"></div>
+                    <div id="org-receivers-section" class="mt-12"></div>
+                </div>
+            `;
+            renderMarketplaceDonors(document.getElementById('org-donors-section'));
+            renderMarketplaceReceivers(document.getElementById('org-receivers-section'));
+        } else if (currentUser.userType === 'donor') {
+            renderMarketplaceReceivers(container);
+        } else { // Receiver
+            renderMarketplaceDonors(container);
+        }
+    };
+
+    const renderMarketplaceReceivers = (container) => {
+        container.innerHTML += `
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Available Receivers</h2>
+            <p class="text-gray-500 mb-6">Connect with potential receivers for your returned items.</p>`;
+        const receivers = usersDB.filter(user => user.userType === 'receiver' || user.userType === 'organization');
+        let receiverContent = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
+        if (receivers.length <= 1 && (currentUser.userType === 'donor' || currentUser.userType === 'organization')) { 
+            receiverContent += `<div class="col-span-full"><p class="text-gray-500 text-center py-12">No other receivers or organizations have registered yet.</p></div>`;
+        } else {
+            let foundOther = false;
+            receivers.forEach(receiver => {
+                if(receiver.email === currentUser.email) return; 
+                foundOther = true;
+                receiverContent += `
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg hover:border-[#00966C] transition-all">
+                        <h3 class="text-xl font-semibold text-gray-800">${receiver.name}</h3>
+                        <p class="text-gray-600 mt-2">${receiver.email}</p>
+                    </div>`;
+            });
+            if(!foundOther) {
+                 receiverContent += `<div class="col-span-full"><p class="text-gray-500 text-center py-12">No other receivers or organizations have registered yet.</p></div>`;
+            }
+        }
+        receiverContent += '</div>';
+        container.innerHTML += receiverContent;
+    };
+
+    const renderMarketplaceDonors = (container) => {
+        container.innerHTML += `
+             <h2 class="text-3xl font-bold text-gray-900 mb-2">Available Donors & Products</h2>
+             <p class="text-gray-500 mb-6">Browse medicines returned by our verified donors.</p>`;
+        const donors = usersDB.filter(user => user.userType === 'donor' || user.userType === 'organization');
+        let donorContent = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
+        if (donors.length === 0) {
+            donorContent += `<div class="col-span-full"><p class="text-gray-500 text-center py-12">No donors have registered yet.</p></div>`;
+        } else {
+            let contentRendered = false;
+            donors.forEach(donor => {
+                if(donor.email === currentUser.email && currentUser.userType === 'organization') return; 
+                const submissions = getSubmissions(donor.email);
+                const verifiedSubmissions = submissions.filter(s => s.status === 'verified');
+                if (verifiedSubmissions.length > 0) {
+                    contentRendered = true;
+                    const productList = verifiedSubmissions.map(s => `
+                        <li class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm py-2 border-t">
+                            <div>
+                                <p class="text-gray-800 font-semibold">${s.name}</p>
+                                <p class="text-gray-500 text-xs">Qty: ${s.quantity} | MRP: ₹${s.mrp}</p>
+                            </div>
+                            <button class="interest-btn mt-2 sm:mt-0 bg-[#00966C] text-white px-3 py-1 rounded-md hover:bg-[#007a57] text-xs font-semibold"
+                                data-med-name="${s.name}"
+                                data-mrp="${s.mrp}"
+                                data-total-tablets="${s.totalTablets}"
+                                data-quantity="${s.quantity}">
+                                I'm Interested
+                            </button>
+                        </li>`).join('');
+                    
+                    donorContent += `
+                        <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200/80">
+                            <h3 class="text-xl font-semibold text-gray-900 border-b pb-2 mb-3">${donor.name}</h3>
+                            <p class="text-gray-500 text-sm mb-4">${donor.email}</p>
+                            <h4 class="font-semibold text-gray-700 mb-2">Available Medicines:</h4>
+                            <ul class="space-y-1">${productList}</ul>
+                        </div>`;
+                }
+            });
+            if (!contentRendered) {
+                 donorContent += `<div class="col-span-full"><p class="text-gray-500 text-center py-12">No verified medicines are available from donors yet.</p></div>`;
+            }
+        }
+        donorContent += '</div>';
+        container.innerHTML += donorContent;
+    };
+    
+    // --- MEDICINES MANAGER ---
+    const renderMedicinesManager = () => {
+        if (!currentUser) return;
+        const container = document.getElementById('medicines-list-container');
+        const summaryContainer = document.getElementById('medicines-summary');
+        const medicines = getMedicines(currentUser.email);
+        let summaryHTML = '';
+
+        // --- Notifications Logic ---
+        const toRepurchase = medicines.filter(m => {
+            const pillsLeft = Number(m.pillsLeft);
+            const perDay = Number(m.perDay);
+            if (isNaN(pillsLeft) || isNaN(perDay) || perDay <= 0) {
+                return false; 
+            }
+            const daysRemaining = pillsLeft / perDay;
+            return daysRemaining <= 7;
+        });
+
+        if (toRepurchase.length > 0) {
+            summaryHTML += `
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert">
+                    <p class="font-bold">Required to Purchase</p>
+                    <p>You have ${toRepurchase.length} medicine(s) that are running low and need to be purchased soon:</p>
+                    <ul class="list-disc list-inside mt-2 text-sm">
+                        ${toRepurchase.map(m => `<li>${m.name} (${Math.floor(m.pillsLeft / m.perDay)} days left)</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        const potentialDonations = medicines.filter(m => {
+            if (!m.daysToTake || !m.totalPills || !m.perDay) return false;
+            const pillsNeeded = m.perDay * m.daysToTake;
+            const leftover = m.totalPills - pillsNeeded;
+            return leftover > 0;
+        });
+
+        if (potentialDonations.length > 0) {
+            summaryHTML += `
+                <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded-lg" role="alert">
+                    <p class="font-bold">Leftover Medicine to Donate</p>
+                    <p>After completing your dosage, you may have the following leftover medicine to donate:</p>
+                    <ul class="list-disc list-inside mt-2 text-sm">
+                        ${potentialDonations.map(m => {
+                            const pillsNeeded = m.perDay * m.daysToTake;
+                            const leftover = m.totalPills - pillsNeeded;
+                            return `<li>${m.name} (${leftover} pills estimated leftover)</li>`;
+                        }).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        summaryContainer.innerHTML = summaryHTML;
+
+
+        // --- Active Medicines List ---
+        if (medicines.length === 0) {
+             container.innerHTML = `<div class="text-center text-gray-500 py-12 bg-white rounded-lg border">
+                <p>You haven't added any medicines to track yet.</p>
+            </div>`;
+        } else {
+            container.innerHTML = medicines.map(med => {
+                const daysLeft = (med.perDay > 0) ? Math.floor(med.pillsLeft / med.perDay) : Infinity;
+                const needsRepurchase = daysLeft !== Infinity && daysLeft <= 7;
+                return `
+                    <div class="bg-white p-6 rounded-lg shadow-md border ${needsRepurchase ? 'border-red-400' : 'border-gray-200'}">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-800">${med.name}</h4>
+                                <p class="text-sm text-gray-600">Pills Left: <span class="font-semibold">${med.pillsLeft}</span></p>
+                                <p class="text-sm text-gray-600">Days Remaining: <span class="font-semibold">${daysLeft === Infinity ? 'N/A' : daysLeft}</span></p>
+                            </div>
+                            <div class="text-right">
+                                ${needsRepurchase ? `<span class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800 mb-2 inline-block">Purchase Soon</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-4">
+                            <button class="take-pill-btn col-span-1 bg-blue-500 text-white px-3 py-1.5 rounded-md hover:bg-blue-600 text-sm font-semibold" data-id="${med.id}">Took 1</button>
+                            <button class="delete-med-btn col-span-1 bg-red-500 text-white px-3 py-1.5 rounded-md hover:bg-red-600 text-sm font-semibold" data-id="${med.id}">Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // --- Render Submitted Donations List ---
+        const submittedListContainer = document.getElementById('submitted-donations-list');
+        const submissions = getSubmissions(currentUser.email);
+
+        if (submissions.length === 0) {
+            submittedListContainer.innerHTML = `<p class="text-center text-gray-500 py-12">You have not submitted any medicines for donation yet.</p>`;
+        } else {
+            submittedListContainer.innerHTML = submissions.map(sub => `
+                <div class="p-3 bg-white rounded-lg border border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold text-gray-800">${sub.name}</p>
+                            <p class="text-xs text-gray-500">Quantity: ${sub.quantity}</p>
+                        </div>
+                        ${statusPill(sub.status)}
+                    </div>
+                </div>
+            `).join('');
+        }
+    };
+
+    document.getElementById('add-medicine-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!currentUser) return;
+        const totalPillsValue = parseInt(document.getElementById('manage-med-total').value);
+        const newMed = {
+            id: `usermed_${Date.now()}`,
+            name: document.getElementById('manage-med-name').value,
+            pillsLeft: totalPillsValue,
+            totalPills: totalPillsValue,
+            perDay: parseInt(document.getElementById('manage-med-per-day').value),
+            daysToTake: parseInt(document.getElementById('manage-med-days').value),
+        };
+        if (isNaN(newMed.pillsLeft) || isNaN(newMed.perDay) || newMed.daysToTake < 0 || newMed.pillsLeft <= 0 || newMed.perDay <= 0) {
+            showModal("Please enter valid, positive numbers for all fields.");
+            return;
+        }
+        const medicines = getMedicines(currentUser.email);
+        medicines.unshift(newMed);
+        saveMedicines(currentUser.email, medicines);
+        renderMedicinesManager();
+        e.target.reset();
+    });
+
+    document.getElementById('medicines-list-container').addEventListener('click', (e) => {
+        if (!currentUser) return;
+        const medicines = getMedicines(currentUser.email);
+        const id = e.target.dataset.id;
+        if (e.target.classList.contains('take-pill-btn')) {
+            const medIndex = medicines.findIndex(m => m.id === id);
+            if (medIndex !== -1 && medicines[medIndex].pillsLeft > 0) {
+                medicines[medIndex].pillsLeft -= 1;
+                saveMedicines(currentUser.email, medicines);
+                renderMedicinesManager();
+            }
+        }
+        if (e.target.classList.contains('delete-med-btn')) {
+            const updatedMedicines = medicines.filter(m => m.id !== id);
+            saveMedicines(currentUser.email, updatedMedicines);
+            renderMedicinesManager();
+        }
+    });
+
+    // --- PROFILE MANAGEMENT ---
+    const renderProfile = () => {
+        if (!currentUser) return;
+        document.getElementById('profile-name').value = currentUser.name || '';
+        document.getElementById('profile-email').value = currentUser.email || '';
+        document.getElementById('profile-phone').value = currentUser.phone || '';
+
+        const orgFieldsDiv = document.getElementById('org-fields');
+        if (currentUser.userType === 'organization') {
+            orgFieldsDiv.classList.remove('hidden');
+            document.getElementById('org-name').value = currentUser.orgName || '';
+            document.getElementById('org-mail').value = currentUser.orgMail || '';
+            document.getElementById('org-id').value = currentUser.orgId || '';
+        } else {
+            orgFieldsDiv.classList.add('hidden');
+        }
+    };
+    
+    document.getElementById('profile-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!currentUser) return;
+        
+        currentUser.name = document.getElementById('profile-name').value;
+        currentUser.phone = document.getElementById('profile-phone').value;
+
+        if (currentUser.userType === 'organization') {
+            currentUser.orgName = document.getElementById('org-name').value;
+            currentUser.orgMail = document.getElementById('org-mail').value;
+            currentUser.orgId = document.getElementById('org-id').value;
+
+            if (currentUser.orgName && currentUser.orgMail && currentUser.orgId) {
+                currentUser.orgProfileComplete = true;
+            } else {
+                showModal("Please fill in all organization details to complete your profile.");
+                return;
+            }
+        }
+        
+        sessionStorage.setItem('medreturn_user', JSON.stringify(currentUser));
+        const userIndex = usersDB.findIndex(user => user.email === currentUser.email);
+        if (userIndex !== -1) {
+            usersDB[userIndex] = currentUser;
+            saveUsers();
+        }
+        
+        showModal('Profile updated successfully!');
+        updateUIForAuthState(); // This will re-evaluate and move to marketplace
+    });
+
+    // --- WALLET & PAYMENT ---
+    const renderWallet = () => {
+        if (!currentUser) return;
+        document.getElementById('wallet-balance').textContent = `₹${(currentUser.wallet || 0).toFixed(2)}`;
+    };
+
+    document.getElementById('add-money-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const amount = parseFloat(document.getElementById('add-money-amount').value);
+        if (isNaN(amount) || amount <= 0) {
+            showModal("Please enter a valid amount.");
+            return;
+        }
+        document.getElementById('payment-amount').textContent = `₹${amount.toFixed(2)}`;
+        paymentModal.classList.remove('hidden');
+    });
+
+    document.getElementById('payment-confirm').addEventListener('click', () => {
+        const amount = parseFloat(document.getElementById('add-money-amount').value);
+        if (!currentUser || isNaN(amount) || amount <= 0) return;
+        
+        currentUser.wallet = (currentUser.wallet || 0) + amount;
+        sessionStorage.setItem('medreturn_user', JSON.stringify(currentUser));
+        const userIndex = usersDB.findIndex(user => user.email === currentUser.email);
+        if (userIndex !== -1) usersDB[userIndex].wallet = currentUser.wallet;
+        saveUsers();
+        paymentModal.classList.add('hidden');
+        document.getElementById('add-money-form').reset();
+        renderWallet();
+        showModal(`₹${amount.toFixed(2)} added to your wallet successfully!`);
+    });
+
+    // --- WITHDRAWAL AND KYC ---
+    document.getElementById('withdraw-button').addEventListener('click', () => {
+        if (!currentUser) return;
+        if (currentUser.kycVerified) {
+            document.getElementById('withdraw-bank-details').textContent = `A/C: ...${currentUser.bankDetails.accountNumber.slice(-4)}, IFSC: ${currentUser.bankDetails.ifsc}`;
+            showSection('withdraw');
+        } else {
+            document.getElementById('kyc-name').value = currentUser.name;
+            showSection('kyc');
+        }
+    });
+
+    document.getElementById('kyc-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if(!currentUser) return;
+        const bankDetails = {
+            pan: document.getElementById('kyc-pan').value,
+            ifsc: document.getElementById('kyc-ifsc').value,
+            accountNumber: document.getElementById('kyc-account-number').value
+        };
+        currentUser.bankDetails = bankDetails;
+        currentUser.kycVerified = true;
+        sessionStorage.setItem('medreturn_user', JSON.stringify(currentUser));
+        const userIndex = usersDB.findIndex(user => user.email === currentUser.email);
+        if (userIndex !== -1) {
+            usersDB[userIndex].bankDetails = bankDetails;
+            usersDB[userIndex].kycVerified = true;
+            saveUsers();
+        }
+        showModal('KYC verification successful!');
+        document.getElementById('withdraw-bank-details').textContent = `A/C: ...${bankDetails.accountNumber.slice(-4)}, IFSC: ${bankDetails.ifsc}`;
+        showSection('withdraw');
+    });
+
+    document.getElementById('withdraw-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!currentUser || !currentUser.kycVerified) return;
+        const amount = parseFloat(document.getElementById('withdraw-amount').value);
+        const balance = currentUser.wallet || 0;
+        if (isNaN(amount) || amount <= 0) {
+            showModal("Please enter a valid amount.");
+            return;
+        }
+        if (amount > balance) {
+            showModal("Withdrawal amount cannot exceed your wallet balance.");
+            return;
+        }
+        currentUser.wallet = balance - amount;
+        sessionStorage.setItem('medreturn_user', JSON.stringify(currentUser));
+        const userIndex = usersDB.findIndex(user => user.email === currentUser.email);
+        if (userIndex !== -1) usersDB[userIndex].wallet = currentUser.wallet;
+        saveUsers();
+        showModal(`Withdrawal of ₹${amount.toFixed(2)} is being processed.`);
+        document.getElementById('withdraw-form').reset();
+        showSection('wallet');
+    });
+
+    // --- AUTHENTICATION LOGIC ---
+    document.getElementById('signup-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('signup-name').value;
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        const confirmPassword = document.getElementById('signup-confirm-password').value;
+        const userType = document.querySelector('input[name="userType"]:checked').value;
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            showModal('Please enter a valid email address format.');
+            return;
+        }
+        if (password.length < 6) {
+             showModal('Password must be at least 6 characters long.');
+            return;
+        }
+        if (password !== confirmPassword) {
+            showModal('The passwords do not match. Please try again.');
+            return;
+        }
+        if (usersDB.find(user => user.email === email)) {
+            showModal('An account with this email already exists.');
+            return;
+        }
+        const newUser = { 
+            name, 
+            email, 
+            password, 
+            userType, 
+            phone: '', 
+            wallet: 0, 
+            kycVerified: false, 
+            bankDetails: {},
+            orgProfileComplete: userType !== 'organization',
+            orgName: '',
+            orgMail: '',
+            orgId: ''
+        };
+        usersDB.push(newUser);
+        saveUsers();
+        currentUser = newUser;
+        sessionStorage.setItem('medreturn_user', JSON.stringify(currentUser));
+        updateUIForAuthState();
+        e.target.reset();
+    });
+
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const user = usersDB.find(u => u.email === email && u.password === password);
+        if (user) {
+            currentUser = user;
+            sessionStorage.setItem('medreturn_user', JSON.stringify(currentUser));
+            updateUIForAuthState();
+            e.target.reset();
+        } else {
+            showModal('Invalid email or password.');
+        }
+    });
+    
+    document.getElementById('forgot-password-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        showModal('If an account with that email exists, a password reset link has been sent.');
+        showSection('login');
+        e.target.reset();
+    });
+
+    document.getElementById('logout-button').addEventListener('click', () => {
+        currentUser = null;
+        sessionStorage.removeItem('medreturn_user');
+        updateUIForAuthState();
+    });
+
+    // --- DASHBOARD RENDERING ---
+    const renderDashboard = () => {
+        if (!currentUser) return;
+        const submissions = getSubmissions(currentUser.email);
+        const container = document.getElementById('submissions-container');
+        if (submissions.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-gray-500 py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No submissions</h3>
+                    <p class="mt-1 text-sm text-gray-500">Get started by submitting your first medicine.</p>
+                </div>`;
+            return;
+        }
+        container.innerHTML = `
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="border-b-2 border-gray-200">
+                        <tr>
+                            <th class="p-4 font-semibold text-gray-600">Medicine Name</th>
+                            <th class="p-4 font-semibold text-gray-600">Batch No.</th>
+                            <th class="p-4 font-semibold text-gray-600">Quantity</th>
+                            <th class="p-4 font-semibold text-gray-600">MRP</th>
+                            <th class="p-4 font-semibold text-gray-600 text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${submissions.map(s => `
+                            <tr class="border-b border-gray-100">
+                                <td class="p-4 font-medium text-gray-800">${s.name}</td>
+                                <td class="p-4 text-gray-600">${s.batch}</td>
+                                <td class="p-4 text-gray-600">${s.quantity}</td>
+                                <td class="p-4 text-gray-600">₹${s.mrp}</td>
+                                <td class="p-4 text-center">${statusPill(s.status)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>`;
+    };
+    
+    // --- MEDICINE SUBMISSION & PRICING LOGIC ---
+    photosInput.addEventListener('change', (e) => {
+        const files = e.target.files;
+        fileListDiv.innerHTML = ''; 
+        if (files.length > 3) {
+            showModal('You can only upload a maximum of 3 images.');
+            e.target.value = ''; 
+            return;
+        }
+        if (files.length > 0) {
+            fileListDiv.innerHTML = Array.from(files).map(file => `
+                <div class="flex items-center space-x-2 text-gray-600">
+                    <svg class="h-4 w-4 text-[#00966C]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>${file.name}</span>
+                </div>
+            `).join('');
+        }
+    });
+
+    document.getElementById('medicine-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!currentUser) return;
+        
+        const newSubmission = {
+            id: `med_${Date.now()}`,
+            name: document.getElementById('med-name').value,
+            mrp: parseFloat(document.getElementById('med-mrp').value),
+            totalTablets: parseInt(document.getElementById('med-total-tablets').value),
+            batch: document.getElementById('batch-no').value,
+            quantity: parseInt(document.getElementById('quantity').value),
+            expiry: document.getElementById('expiry-date').value,
+            photos: photosInput.files.length,
+            submitted: new Date().toLocaleDateString('en-GB'),
+            status: 'pending'
+        };
+
+        if (newSubmission.quantity > newSubmission.totalTablets) {
+            showModal("Remaining quantity cannot be greater than the total tablets in the pack.");
+            return;
+        }
+        if (isNaN(newSubmission.mrp) || newSubmission.mrp <= 0 || isNaN(newSubmission.totalTablets) || newSubmission.totalTablets <= 0) {
+            showModal("Please enter valid MRP and Total Tablets.");
+            return;
+        }
+
+        const submissions = getSubmissions(currentUser.email);
+        submissions.unshift(newSubmission); 
+        saveSubmissions(currentUser.email, submissions);
+        
+        setTimeout(() => { // Simulate verification
+            const currentSubmissions = getSubmissions(currentUser.email);
+            const toVerify = currentSubmissions.find(s => s.id === newSubmission.id);
+            if (toVerify) {
+                toVerify.status = 'verified';
+                saveSubmissions(currentUser.email, currentSubmissions);
+                renderDashboard(); // Re-render dashboard after status change
+            }
+        }, 2000);
+
+        renderDashboard();
+        showSection('dashboard');
+        e.target.reset();
+        fileListDiv.innerHTML = '';
+        showModal('Your medicine has been submitted and is pending verification!');
+    });
+
+    document.getElementById('marketplace-container').addEventListener('click', (e) => {
+        if (e.target.classList.contains('interest-btn')) {
+            const btn = e.target;
+            const medName = btn.dataset.medName;
+            const mrp = parseFloat(btn.dataset.mrp);
+            const totalTablets = parseInt(btn.dataset.totalTablets);
+            const remainingQty = parseInt(btn.dataset.quantity);
+            if (isNaN(mrp) || isNaN(totalTablets) || isNaN(remainingQty)) {
+                showModal("Pricing information is unavailable.");
+                return;
+            }
+            const valueOfRemaining = (mrp / totalTablets) * remainingQty;
+            const receiverPrice = valueOfRemaining * 0.35;
+            const donorGets = valueOfRemaining * 0.30;
+            const medReturnGets = valueOfRemaining * 0.05;
+
+            showModal(`
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Price Estimation</h3>
+                <p class="text-lg font-medium text-gray-800 mb-4">${medName}</p>
+                <div class="text-left space-y-2 text-sm">
+                    <p>Original Value of Remaining Tablets: <span class="font-semibold">₹${valueOfRemaining.toFixed(2)}</span></p>
+                    <hr class="my-2">
+                    <p class="text-green-600 font-bold text-lg">You Pay (65% OFF): <span class="font-bold">₹${receiverPrice.toFixed(2)}</span></p>
+                    <hr class="my-2">
+                    <p class="text-gray-600">Donor Receives: <span class="font-semibold">₹${donorGets.toFixed(2)}</span></p>
+                    <p class="text-gray-600">MedReturn Fee: <span class="font-semibold">₹${medReturnGets.toFixed(2)}</span></p>
+                </div>`, true);
+        }
+    });
+    
+    // --- CHATBOT & AI LOGIC ---
+    const chatWindow = document.getElementById('chat-window');
+    const chatInput = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-btn');
+    const chatFab = document.getElementById('chat-fab');
+    const verifyAiBtn = document.getElementById('verify-ai-btn');
+
+    function addMessage(sender, text) {
+      const msg = document.createElement('div');
+      msg.className = sender === 'user' ? 'text-right' : 'text-left';
+      msg.innerHTML = `<span class="inline-block px-3 py-2 rounded-lg ${sender==='user'?'bg-[#00966C] text-white':'bg-gray-200 text-gray-800'}">${text}</span>`;
+      chatWindow.appendChild(msg);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+      return msg;
+    }
+
+    async function generateGeminiContent(prompt, systemInstruction) {
+        if (!GEMINI_API_KEY) {
+            return "NO_KEY";
+        }
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
+        const payload = {
+            contents: [{ parts: [{ text: prompt }] }],
+            systemInstruction: { parts: [{ text: systemInstruction }] },
+        };
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) throw new Error(`API Error: ${response.status}`);
+            const result = await response.json();
+            return result.candidates?.[0]?.content?.parts?.[0]?.text || null;
+        } catch (error) {
+            console.error("AI Error:", error);
+            return "ERROR";
+        }
+    }
+    
+    verifyAiBtn.addEventListener('click', async () => {
+        const statusDiv = document.getElementById('ai-verification-status');
+        const medName = document.getElementById('med-name').value;
+        const mrp = document.getElementById('med-mrp').value;
+        const totalTablets = document.getElementById('med-total-tablets').value;
+        if (!medName || !mrp || !totalTablets) {
+            showModal("Please fill in Medicine Name, MRP, and Total Tablets to verify.");
+            return;
+        }
+        statusDiv.textContent = 'Verifying...';
+        statusDiv.className = 'text-xs font-medium text-blue-600';
+
+        const prompt = `Medicine Name: "${medName}", MRP: Rs. ${mrp}, Tablets per pack: ${totalTablets}. Are these values reasonable for a real medicine in India? Respond with only "Reasonable" or "Unreasonable".`;
+        const systemInstruction = "You are a validation assistant. Analyze for plausibility. Your only possible outputs are 'Reasonable' or 'Unreasonable'.";
+        const result = await generateGeminiContent(prompt, systemInstruction);
+
+        if (result === "NO_KEY") {
+             statusDiv.textContent = 'API Key Missing';
+             statusDiv.className = 'text-xs font-medium text-red-600';
+             showModal("Cannot verify with AI. The API key is missing from the code.");
+        } else if (result && result.toLowerCase().includes('reasonable')) {
+            statusDiv.textContent = 'AI Verified';
+            statusDiv.className = 'text-xs font-medium text-green-600';
+        } else if (result) {
+            statusDiv.textContent = 'AI Check Failed';
+            statusDiv.className = 'text-xs font-medium text-red-600';
+            showModal("AI check suggests the values might be incorrect. Please double-check.");
+        } else {
+            statusDiv.textContent = 'Verification Error';
+            statusDiv.className = 'text-xs font-medium text-red-600';
+            showModal("Could not verify with AI. Check the console for errors.");
+        }
+    });
+
+    sendBtn.addEventListener('click', async () => {
+        const text = chatInput.value.trim();
+        if (!text) return;
+        addMessage('user', text);
+        chatInput.value = '';
+        const typingMessage = addMessage('bot', 'AI Doctor is typing...');
+        typingMessage.querySelector('span').classList.add('italic', 'text-gray-500');
+
+        const systemPrompt = `You are an AI medical assistant. Your name is 'AI Doctor'. ALWAYS begin with a disclaimer: "Disclaimer: I am an AI assistant and not a medical professional. This information is for general purposes only. Please consult a qualified doctor for a proper diagnosis and treatment." Then, provide helpful, general health information. Do not provide prescriptions.`;
+        const result = await generateGeminiContent(text, systemPrompt);
+        
+        let finalReply = "I'm sorry, I'm having trouble connecting. Please try again later.";
+        if (result === "NO_KEY") finalReply = "The AI chatbot is not configured. The API key is missing.";
+        else if (result !== "ERROR" && result) finalReply = result;
+
+        typingMessage.querySelector('span').textContent = finalReply;
+        typingMessage.querySelector('span').classList.remove('italic', 'text-gray-500');
+    });
+
+    chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendBtn.click(); });
+    chatFab.addEventListener('click', () => showSection('chatbot'));
+
+    // --- ADMIN PANEL LOGIC ---
+    const renderAdminPanel = () => {
+        // Stats
+        const totalUsers = usersDB.length;
+        const totalDonors = usersDB.filter(u => u.userType === 'donor').length;
+        const totalReceivers = usersDB.filter(u => u.userType === 'receiver').length;
+        
+        let allSubmissions = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('submissions_')) {
+                const userSubmissions = JSON.parse(localStorage.getItem(key));
+                const userEmail = key.replace('submissions_', '');
+                userSubmissions.forEach(sub => allSubmissions.push({...sub, donor: userEmail}));
+            }
+        }
+        document.getElementById('admin-total-users').textContent = totalUsers;
+        document.getElementById('admin-total-donors').textContent = totalDonors;
+        document.getElementById('admin-total-receivers').textContent = totalReceivers;
+        document.getElementById('admin-total-submissions').textContent = allSubmissions.length;
+
+        // Users Table
+        const usersTable = document.getElementById('admin-users-table');
+        usersTable.innerHTML = usersDB.map(user => `
+            <tr class="border-b border-gray-200 hover:bg-gray-50">
+                <td class="p-3">${user.name}</td>
+                <td class="p-3">${user.email}</td>
+                <td class="p-3">${user.userType}</td>
+                <td class="p-3">₹${(user.wallet || 0).toFixed(2)}</td>
+                <td class="p-3"><button class="admin-delete-user-btn text-red-500 hover:text-red-700 font-medium" data-email="${user.email}">Delete</button></td>
+            </tr>
+        `).join('');
+
+        // Submissions Table
+        const submissionsTable = document.getElementById('admin-submissions-table');
+        submissionsTable.innerHTML = allSubmissions.map(sub => `
+             <tr class="border-b border-gray-200 hover:bg-gray-50">
+                <td class="p-3">${sub.name}</td>
+                <td class="p-3">${sub.donor}</td>
+                <td class="p-3">${statusPill(sub.status)}</td>
+            </tr>
+        `).join('');
+    };
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.shiftKey && (e.key === 'U' || e.key === 'u')) {
+            e.preventDefault();
+            const password = prompt("Please enter the admin password:");
+            if (password === "admin@hackathon@2025") {
+                renderAdminPanel();
+                showSection('admin-panel');
+            } else if (password !== null) { // Only show message if user didn't click cancel
+                showModal("Incorrect password.");
+            }
+        }
+    });
+
+    document.getElementById('close-admin-panel').addEventListener('click', () => {
+        showSection(currentUser ? 'marketplace' : 'landing');
+    });
+
+    document.getElementById('admin-users-table').addEventListener('click', (e) => {
+        if (e.target.classList.contains('admin-delete-user-btn')) {
+            const emailToDelete = e.target.dataset.email;
+            if (confirm(`Are you sure you want to delete the user ${emailToDelete}? This action cannot be undone.`)) {
+                usersDB = usersDB.filter(user => user.email !== emailToDelete);
+                saveUsers();
+                localStorage.removeItem(`submissions_${emailToDelete}`);
+                localStorage.removeItem(`medicines_${emailToDelete}`);
+                renderAdminPanel(); // Refresh the panel
+                showModal(`User ${emailToDelete} and their data have been deleted.`);
+            }
+        }
+    });
+
+    // --- Profile Dropdown Logic ---
+    const profileDropdownBtn = document.getElementById('profile-dropdown-btn');
+    const profileDropdownMenu = document.getElementById('profile-dropdown-menu');
+
+    profileDropdownBtn.addEventListener('click', () => {
+        profileDropdownMenu.classList.toggle('hidden');
+    });
+
+    // Close dropdown if clicked outside
+    window.addEventListener('click', function(e) {
+        const container = document.getElementById('profile-dropdown-container');
+        if (container && !container.contains(e.target)) {
+            profileDropdownMenu.classList.add('hidden');
+        }
+    });
+
+
+    // --- INITIALIZATION ---
+    const checkSession = () => {
+        const user = sessionStorage.getItem('medreturn_user');
+        if (user) currentUser = JSON.parse(user);
+        updateUIForAuthState();
+        addMessage('bot', 'Welcome! How can I help you today?');
+    };
+
+    checkSession(); 
+});
+</script>
+
+</body>
+</html>
+
