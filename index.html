@@ -7,101 +7,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
-  
-  <style>
-    :root {
-      --bg-color: #0f172a;
-      --bg-darker: #020617;
-      --card-bg: rgba(30, 41, 59, 0.7);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --primary: #38bdf8;
-      --primary-hover: #0ea5e9;
-      --gradient: linear-gradient(90deg, #38bdf8 0%, #818cf8 100%);
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; }
-    body { overflow-x: hidden; }
-
-    /* Typography */
-    .gradient-text { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: transparent; }
-    h1, h2, h3, .logo { font-family: 'Space Grotesk', sans-serif; }
-
-    /* Navbar */
-    .navbar { position: fixed; top: 0; width: 100%; padding: 1.5rem 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; }
-    .logo { font-size: 1.8rem; font-weight: 700; text-decoration: none; color: var(--text-main); }
-    .logo span { color: var(--primary); }
-    .nav-links { display: flex; gap: 2rem; align-items: center; }
-    .nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; transition: var(--transition); }
-    .nav-links a:hover { color: var(--primary); }
-    .nav-btn { border: 1px solid var(--primary); padding: 0.5rem 1.2rem; border-radius: 6px; color: var(--primary) !important; }
-
-    /* Hero Section */
-    .hero { min-height: 100vh; display: flex; align-items: center; position: relative; padding: 0 2rem; padding-top: 80px; overflow: hidden; }
-    .glow-blob { position: absolute; border-radius: 50%; filter: blur(120px); z-index: -1; opacity: 0.4; animation: float 10s infinite ease-in-out alternate; }
-    .blob-1 { width: 400px; height: 400px; background: #38bdf8; top: 10%; left: -10%; }
-    .blob-2 { width: 500px; height: 500px; background: #818cf8; bottom: -10%; right: -5%; animation-delay: -5s; }
-    @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
-    .hero-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-    .hero-title { font-size: 4.5rem; line-height: 1.1; margin-bottom: 1rem; }
-    .hero-subtitle { font-size: 2rem; color: var(--text-muted); margin-bottom: 1.5rem; min-height: 40px; }
-    .cursor { display: inline-block; width: 3px; background-color: var(--primary); animation: blink 1s infinite; }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-    .hero-desc { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 2.5rem; line-height: 1.7; max-width: 500px; }
-    
-    /* Image Styling */
-    .hero-image-wrapper { display: flex; justify-content: center; animation: floatImg 6s ease-in-out infinite; }
-    @keyframes floatImg { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-    .image-border { padding: 10px; background: var(--gradient); border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; box-shadow: 0 0 40px rgba(56, 189, 248, 0.3); }
-    .hero-img { width: 100%; max-width: 400px; height: auto; display: block; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; object-fit: cover; border: 4px solid var(--bg-color); }
-
-    /* Sections */
-    .section { padding: 6rem 2rem; }
-    .bg-darker { background-color: var(--bg-darker); }
-    .section-container { max-width: 1200px; margin: 0 auto; }
-    .section-heading { font-size: 2.5rem; margin-bottom: 3rem; }
-    .text-center { text-align: center; }
-    
-    /* Project Cards */
-    .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; }
-    .project-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 2rem; transition: var(--transition); backdrop-filter: blur(10px); }
-    .project-card:hover { transform: translateY(-10px); border-color: var(--primary); }
-    .project-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
-    .project-tags span { font-size: 0.8rem; padding: 0.3rem 0.8rem; background: rgba(56, 189, 248, 0.1); color: var(--primary); border-radius: 20px; }
-
-    /* About Section Grid */
-    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem; }
-    .about-card { background: var(--card-bg); padding: 2rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
-    .about-card h3 { color: var(--primary); margin-bottom: 1rem; }
-    .about-card p { color: var(--text-muted); line-height: 1.6; margin-bottom: 0.5rem; }
-
-    /* Buttons */
-    .btn { padding: 0.8rem 1.8rem; border-radius: 8px; font-weight: 600; text-decoration: none; transition: var(--transition); display: inline-block; cursor: pointer; }
-    .btn-primary { background: var(--gradient); color: white; border: none; }
-    .btn-secondary { background: transparent; color: var(--text-main); border: 1px solid rgba(255,255,255,0.2); }
-
-    /* Footer */
-    footer { text-align: center; padding: 2rem; background: var(--bg-darker); border-top: 1px solid rgba(255,255,255,0.05); }
-
-    @media (max-width: 968px) {
-      .hero-container, .about-grid { grid-template-columns: 1fr; text-align: center; }
-      .hero-title { font-size: 3.5rem; }
-      .hero-desc { margin: 0 auto 2rem; }
-      .nav-links { display: none; }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="navbar">
     <div class="nav-container">
-      <a href="#" class="logo">Kartikey<span>.</span></a>
+      <a href="#" class="logo">KB<span>.</span></a>
       <nav class="nav-links">
         <a href="#home">Home</a>
         <a href="#about">About</a>
         <a href="#projects">Projects</a>
+        <a href="#skills">Skills</a>
         <a href="#contact" class="nav-btn">Contact Me</a>
       </nav>
     </div>
@@ -111,43 +27,24 @@
     <section id="home" class="hero">
       <div class="glow-blob blob-1"></div>
       <div class="glow-blob blob-2"></div>
+
       <div class="hero-container">
         <div class="hero-content">
-          <p style="color:var(--primary); font-weight:600; margin-bottom:1rem;">👋 Welcome to my world</p>
+          <p class="hero-greeting">👋 Welcome to my world</p>
           <h1 class="hero-title">Hi, I'm <br><span class="gradient-text">Kartikey Barman</span></h1>
           <h2 class="hero-subtitle">I am a <span class="typing-text"></span><span class="cursor">&nbsp;</span></h2>
           <p class="hero-desc">
-            Computer Science student at St. Aloysius Institute of Technology. I build robust web apps, explore cybersecurity, and develop games.
+            A 5th-semester Computer Science student at St. Aloysius Institute of Technology. I specialize in building robust full-stack web applications, exploring the depths of cybersecurity, and engineering 2D racing games.
           </p>
-          <div style="display:flex; gap:1rem;">
+          <div class="hero-buttons">
             <a href="#projects" class="btn btn-primary">Explore My Work</a>
-            <a href="https://github.com/Kartikey27777" target="_blank" class="btn btn-secondary">GitHub</a>
+            <a href="https://github.com/" target="_blank" class="btn btn-secondary">Visit GitHub</a>
           </div>
         </div>
+
         <div class="hero-image-wrapper">
           <div class="image-border">
-            <img src="1000357201.png" alt="Kartikey Barman" class="hero-img" />
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="about" class="section bg-darker">
-      <div class="section-container">
-        <h2 class="section-heading">Academic & <span class="gradient-text">Achievements</span></h2>
-        <div class="about-grid">
-          <div class="about-card">
-            <h3>Education</h3>
-            <p><strong>B.Tech CSE (2023-Present)</strong><br>St. Aloysius Institute of Technology</p>
-            <p><strong>Class 12th (2023):</strong> 93.6%<br>Govt. HSS Guraiyaghat</p>
-            <p><strong>Class 10th (2021):</strong> 89.0%<br>Govt. HSS Guraiyaghat</p>
-          </div>
-          <div class="about-card">
-            <h3>Recognition</h3>
-            <p>🏆 Certified by CM of Madhya Pradesh (2023)</p>
-            <p>🏏 College Cricket Team Captain</p>
-            <p>📜 Infosys Springboard Certified (HTML/CSS/JS)</p>
-            <p>🎮 eSports Enthusiast (BGMI)</p>
+            <img src="https://ui-avatars.com/api/?name=Kartikey+Barman&size=400&background=1e293b&color=38bdf8" alt="Kartikey Barman" class="hero-img" />
           </div>
         </div>
       </div>
@@ -157,90 +54,85 @@
       <div class="section-container">
         <h2 class="section-heading">Featured <span class="gradient-text">Projects</span></h2>
         <div class="project-grid">
+          
           <div class="project-card">
-            <h3>Student ERP System</h3>
-            <p>Full ERP using Flask and CSV database management.</p>
-            <div class="project-tags"><span>Python</span><span>Flask</span><span>CSV</span></div>
+            <div class="project-content">
+              <h3>Attendance Management System</h3>
+              <p>A comprehensive ERP module featuring secure teacher and admin panels with automated Excel report generation.</p>
+              <div class="project-tags">
+                <span>Python</span><span>FastAPI</span><span>SQL</span>
+              </div>
+            </div>
           </div>
+
           <div class="project-card">
-            <h3>Performance Prediction</h3>
-            <p>ML model analyzing student data for future performance.</p>
-            <div class="project-tags"><span>ML</span><span>Python</span><span>Pandas</span></div>
+            <div class="project-content">
+              <h3>2D Infinite Bike Racing Game</h3>
+              <p>A custom-built game featuring physics-based hill climbing, coin collection mechanics, and dynamic rendering.</p>
+              <div class="project-tags">
+                <span>C++</span><span>SFML</span>
+              </div>
+            </div>
           </div>
+
           <div class="project-card">
-            <h3>Hand Gesture Controller</h3>
-            <p>Volume control via computer vision and gestures.</p>
-            <div class="project-tags"><span>OpenCV</span><span>Flask</span></div>
+            <div class="project-content">
+              <h3>Secure OTP Login Portal</h3>
+              <p>A robust authentication system integrating Zoho Creator and the Twilio API for secure SMS-based verification.</p>
+              <div class="project-tags">
+                <span>HTML/CSS</span><span>JS</span><span>APIs</span>
+              </div>
+            </div>
           </div>
-          <div class="project-card">
-            <h3>Weather Check</h3>
-            <p>Dynamic weather updates using external APIs.</p>
-            <div class="project-tags"><span>API</span><span>JavaScript</span><span>Flask</span></div>
+
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" class="section bg-darker">
+      <div class="section-container text-center">
+        <h2 class="section-heading">My <span class="gradient-text">Tech Stack</span></h2>
+        <p class="section-subheading">Technologies and tools I use to bring ideas to life.</p>
+        
+        <div class="skills-wrapper">
+          <div class="skill-category">
+            <h3>Languages</h3>
+            <div class="skill-pills">
+              <span>Python</span><span>C++</span><span>JavaScript</span><span>Java</span><span>C</span>
+            </div>
           </div>
-          <div class="project-card">
-            <h3>2D Racing Game</h3>
-            <p>Physics-based infinite hill climbing game.</p>
-            <div class="project-tags"><span>C++</span><span>SFML</span></div>
+          <div class="skill-category">
+            <h3>Frontend & Design</h3>
+            <div class="skill-pills">
+              <span>HTML5</span><span>CSS3</span><span>React</span><span>Next.js</span><span>Tailwind CSS</span>
+            </div>
           </div>
-          <div class="project-card">
-            <h3>Resume Builder</h3>
-            <p>Automated PDF resume generator with custom layouts.</p>
-            <div class="project-tags"><span>Python</span><span>Matplotlib</span></div>
+          <div class="skill-category">
+            <h3>Backend & Databases</h3>
+            <div class="skill-pills">
+              <span>Django</span><span>Flask</span><span>FastAPI</span><span>MySQL</span><span>SQLite</span>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <section id="contact" class="section">
-      <div class="section-container text-center" style="background:var(--card-bg); padding:4rem; border-radius:24px;">
+      <div class="section-container text-center contact-box">
         <h2 class="section-heading">Let's <span class="gradient-text">Connect</span></h2>
-        <p style="color:var(--text-muted); margin-bottom:2rem;">Phone: +91 9131079909</p>
-        <div style="display:flex; gap:1rem; justify-content:center;">
-          <a href="mailto:kartikeybarman27@gmail.com" class="btn btn-primary">Email Me</a>
-          <a href="https://www.linkedin.com/in/kartikey-barman-85537b312" target="_blank" class="btn btn-secondary">LinkedIn</a>
-        </div>
+        <p class="contact-text">Currently seeking new opportunities, internships, and exciting projects. Whether you have a question or just want to say hi, I'll try my best to get back to you!</p>
+        <a href="mailto:kartikeybarman27@gmail.com" class="btn btn-primary contact-btn">Say Hello 👋</a>
       </div>
     </section>
   </main>
 
   <footer>
-    <p>© 2026 Kartikey Barman | Built from scratch</p>
+    <div class="footer-content">
+      <p>Built from scratch by Kartikey Barman</p>
+      <p class="copyright">© 2026. All rights reserved.</p>
+    </div>
   </footer>
 
-  <script>
-    const words = ["Full-Stack Developer", "Game Developer", "Tech Enthusiast", "Cricket Captain"];
-    let i = 0;
-    const typingText = document.querySelector('.typing-text');
-
-    function typingEffect() {
-      let word = words[i].split("");
-      let loopTyping = () => {
-        if (word.length > 0) {
-          typingText.innerHTML += word.shift();
-          setTimeout(loopTyping, 100);
-        } else {
-          setTimeout(deletingEffect, 2000);
-        }
-      };
-      loopTyping();
-    }
-
-    function deletingEffect() {
-      let word = typingText.innerHTML.split("");
-      let loopDeleting = () => {
-        if (word.length > 0) {
-          word.pop();
-          typingText.innerHTML = word.join("");
-          setTimeout(loopDeleting, 50);
-        } else {
-          i = (i + 1) % words.length;
-          setTimeout(typingEffect, 500);
-        }
-      };
-      loopDeleting();
-    }
-
-    document.addEventListener("DOMContentLoaded", typingEffect);
-  </script>
+  <script src="script.js"></script>
 </body>
-</html>
+  </html>
