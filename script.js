@@ -1,5 +1,5 @@
 // Typewriter Effect for the Hero Section
-const words = ["Full-Stack Developer", "Game Developer", "Tech Enthusiast"];
+const words = ["Computer Science Student","Fresher"];
 let i = 0;
 let timer;
 const typingText = document.querySelector('.typing-text');
@@ -54,4 +54,37 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             });
         }
     });
+});
+// Intersection Observer for Scroll Reveal
+const revealOnScroll = () => {
+    const observerOptions = {
+        threshold: 0.15 // Reveal when 15% of the element is visible
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = "1";
+                entry.target.style.transform = "translateY(0)";
+                observer.unobserve(entry.target); // Only animate once
+            }
+        });
+    }, observerOptions);
+
+    // Targets for animation
+    const targets = document.querySelectorAll('.education-card, .achievement-item, .project-card');
+    
+    targets.forEach(target => {
+        // Initial state
+        target.style.opacity = "0";
+        target.style.transform = "translateY(30px)";
+        target.style.transition = "all 0.6s ease-out";
+        observer.observe(target);
+    });
+};
+
+// Initialize scroll reveal
+document.addEventListener("DOMContentLoaded", () => {
+     // Your existing function
+    revealOnScroll();
 });
