@@ -1,4 +1,3 @@
-
 :root {
   --bg-color: #0f172a;
   --bg-darker: #020617;
@@ -365,6 +364,108 @@ h1, h2, h3, .logo {
   border-color: var(--primary);
   color: var(--primary);
   transform: translateY(-2px);
+}
+/* --- Academic Excellence Section --- */
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.education-card {
+  background: var(--card-bg);
+  padding: 2.5rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  transition: var(--transition);
+  overflow: hidden;
+}
+
+.education-card:hover {
+  transform: translateY(-10px);
+  border-color: var(--primary);
+  background: rgba(30, 41, 59, 0.9);
+}
+
+.edu-year {
+  display: inline-block;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.education-card h3 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.education-card p {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.cgpa-badge, .score-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: var(--gradient);
+  color: white;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+/* --- Achievements & Honors Section --- */
+.achievements-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.achievement-item {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 1.5rem;
+  border-radius: 16px;
+  border-left: 4px solid var(--primary);
+  transition: var(--transition);
+}
+
+.achievement-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+  padding-left: 2rem;
+}
+
+.ach-icon {
+  font-size: 2.5rem;
+}
+
+.cert-box {
+  background: var(--bg-color);
+  padding: 2rem;
+  border-radius: 20px;
+  border: 1px dashed rgba(129, 140, 248, 0.4);
+  text-align: center;
+}
+
+.cert-box h3 {
+  margin-bottom: 1.5rem;
+  font-size: 1.2rem;
+  color: var(--text-main);
+}
+
+/* Mobile Fix for Achievements */
+@media (max-width: 768px) {
+  .achievements-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Contact */
